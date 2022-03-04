@@ -6,17 +6,11 @@ import subprocess
 #sanity: input: regex. 1 filename, output: one matched line
 def test_one():
     regex="away"
-    filename = "file1.txt"
+    filename = "CodingTask/file1.txt"
     command = f"python3 practice.py {regex} {filename}"
-    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = proc.communicate()
-    # print(out)
-    # print(type(out))
-    # print(['file1.txt 1 one line goes away goes\nfile1.txt 3 and I like to go away\n'.encode('ascii'), out])
-    if out == 'file1.txt 1 one line goes away goes\nfile1.txt 3 and I like to go away\n'.encode('ascii'):
-        print("Vasa")
-    else:
-        print("Vaks")
+    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out = result.stdout.decode('ascii')
+    err = result.stderr.decode('ascii')
     assert out == 'file1.txt 1 one line goes away goes\nfile1.txt 3 and I like to go away\n'
 
     assert err == ''
