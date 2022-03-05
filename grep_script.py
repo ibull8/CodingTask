@@ -20,6 +20,17 @@ def get_arguments():
     return args
 
 
+def get_print_function(args):
+    if args.underscore:
+        return print_underscore
+    elif args.color:
+        return print_colored
+    elif args.machine:
+        return print_machine_format
+    else:
+        return print_matches
+
+
 def find_match(args):
     filehandlers = args.infile
     regex = args.regex_pattern
@@ -30,14 +41,9 @@ def find_match(args):
         while line:
             line_number += 1
             for match in re.finditer(regex, line):
-                if args.underscore:
-                    print_underscore(filehandler.name, line_number, match)
-                elif args.color:
-                    print_colored(filehandler.name, line_number, match)
-                elif args.machine:
-                    print_machine_format(filehandler.name, line_number, match)
-                else:
-                    print_matches(filehandler.name, line_number, match)
+                # get_print_function returns the relevant print function to execute
+                # and afterwards the print function is invoked
+                get_print_function(args)(filehandler.name, line_number, match)
             line = filehandler.readline().strip()
 
 
@@ -59,7 +65,7 @@ def calc_underscore_start_position(filename, line_number, match_start_position):
 
 def print_colored(filename, line_number, match):
     line = match.string
-    print("{filename} {line_number} ".format(filename=filename, line_number=line_number)+ line[:match.start()] +
+    print("{filename} {line_number} ".format(filename=filename, line_number=line_number) + line[:match.start()] +
           '\033[0;36m' + match.group() + '\033[0;00m' + line[match.end():])
 
 
