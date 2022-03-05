@@ -1,4 +1,3 @@
-#! /usr/bin/python3
 import re
 import argparse
 import sys
@@ -7,7 +6,7 @@ import sys
 def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("regex_pattern", type=str, help="regex pattern")
-    parser.add_argument('infile', nargs='*', type=argparse.FileType(mode='r', encoding='ascii'),
+    parser.add_argument('infile', nargs='*', type=argparse.FileType(mode='r'),
                         default=[sys.stdin], help="input files to search in")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-u", "--underscore", action='store_true', required=False,
@@ -43,11 +42,13 @@ def find_match(args):
 
 
 def print_matches(filename, line_number, match):
-    print(f"{filename} {line_number} {match.string}")
+    print("{filename} {line_number} {line}".format(filename=filename, line_number=line_number,
+                                                   line=match.string))
 
 
 def print_underscore(filename, line_number, match):
-    print(f"{filename} {line_number} {match.string}")
+    print("{filename} {line_number} {line}".format(filename=filename, line_number=line_number,
+                                                   line=match.string))
     amount_of_spaces = calc_underscore_start_position(filename, line_number, match.start())
     print(' ' * amount_of_spaces + "^")
 
@@ -57,13 +58,14 @@ def calc_underscore_start_position(filename, line_number, match_start_position):
 
 
 def print_colored(filename, line_number, match):
-    print(f"{filename} {line_number}", end=" ")
     line = match.string
-    print(line[:match.start()] + '\033[0;36m' + match.group() + '\033[0;00m' + line[match.end():])
+    print("{filename} {line_number} ".format(filename=filename, line_number=line_number)+ line[:match.start()] +
+          '\033[0;36m' + match.group() + '\033[0;00m' + line[match.end():])
 
 
 def print_machine_format(filename, line_number, match):
-    print(f"{filename}:{line_number}:{match.start()}:{match.group()}")
+    print("{filename}:{line_number}:{start_position}:{match}".format(filename=filename, line_number=line_number,
+                                                                     start_position=match.start(), match=match.group()))
 
 
 def main():
